@@ -4,15 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { Octokit } from '@octokit/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
-// import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import Markdown from 'marked-react';
 import throttle from 'lodash/throttle';
+const PersonalAccessToken = process.env.REACT_APP_PERSONAL_ACCESS_TOKEN;
 const CLIENT_ID = 'Iv1.5f95480a214aafea';
-
-// const PersonalAccessToken = process.env.personalToken;
-// import dotenv from 'dotenv';
-// dotenv.config();
-const PersonalAccessToken  = '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';
 const PER_PAGE = 10;
 
 function App() {
