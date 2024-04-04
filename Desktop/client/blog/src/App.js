@@ -6,7 +6,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import Markdown from 'marked-react';
 import throttle from 'lodash/throttle';
-const PersonalAccessToken = process.env.REACT_APP_PERSONAL_ACCESS_TOKEN;
+const OauthToken = process.env.REACT_APP_PERSONAL_ACCESS_TOKEN;
+// const OauthToken = '61297a0a18ca9bdeb6fa';
+// const OauthToken = 'd52433f44c2e97583977ab8bdb9665071a4caa1b';
 const CLIENT_ID = 'Iv1.5f95480a214aafea';
 const PER_PAGE = 10;
 
@@ -23,7 +25,6 @@ function App() {
   const [editedTitle, setEditedTitle] = useState('');
   const [editedContent, setEditedContent] = useState('');
   const [editingIssueId, setEditingIssueId] = useState();
-  const [author_association, setAuthorAssociation] = useState();
   //add issue
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
@@ -63,24 +64,6 @@ function App() {
     }
   }, [localStorage.getItem('accessToken')]);
 
-  // const getUserData = async () => {
-  //   try {
-  //     const accessToken = localStorage.getItem('accessToken');
-  //     const response = await fetch(`http://localhost:4000/getUserData`, {
-  //       method: 'GET',
-  //       headers: {
-  //         'Authorization': `Bearer ${accessToken}`
-  //       }
-  //     });
-  //     const data = await response.json();
-  //     const octokit = new Octokit({ auth: accessToken });
-  //     const repositoriesResponse = await octokit.request('GET /user/repos');
-  //     setRepositories(repositoriesResponse.data);
-  //     setUserData(data);
-  //   } catch (error) {
-  //     handleError(error);
-  //   }
-  // };
   const getUserData = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
@@ -180,38 +163,12 @@ function App() {
   
   function logingithub() {
     window.location.assign(
-      `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=repo%20read:user%20write:discussion%20repo:status%20write:repo`
+      `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=repo%20read:user:email%20gist`
     );
   }
   const handleError = (error) => {
     console.error('Error:', error);
   };
-  // 删除文章
-  // const DeleteIssue = async (issueId) => {
-  //   if (window.confirm('Are you sure you want to delete this issue?')) {
-  //     try {
-  //       const editedIssue = issue.find(item => item.id === issueId);
-  //       if (!editedIssue) {
-  //         console.error('Edited issue not found in the issue array.');
-  //         return;
-  //       }
-  //       const accessToken = localStorage.getItem('accessToken');
-  //       const octokit = new Octokit({ auth: accessToken });
-  
-  //       // 使用 GitHub REST API 删除 Issue
-  //       await octokit.request(`DELETE /repos/${owner}/${repoName}/issues/${editedIssue.number}`, {
-  //         headers: {
-  //           Authorization: `token ${accessToken}`
-  //         }
-  //       });
-  
-  //       // 从 issue 状态中移除被删除的 Issue
-  //       setIssue(prevIssue => prevIssue.filter(issueItem => issueItem.id !== issueId));
-  //     } catch (error) {
-  //       handleError(error);
-  //     }
-  //   }
-  // }
   //編輯文章
   const EditingCompleted = async (id, title, content) => {
     const editedIssue = issue.find(item => item.id === id);
@@ -230,7 +187,8 @@ function App() {
     } 
   
     try {
-      const accessToken = PersonalAccessToken;
+      // const accessToken = PersonalAccessToken;
+      const accessToken = OauthToken;
       if (!accessToken) {
         console.error('Access token not found.');
         return;
@@ -272,7 +230,8 @@ function App() {
   //新增文章
   const handleSubmit = async () => {
     try {
-      const accessToken = PersonalAccessToken;
+      // const accessToken = PersonalAccessToken;
+      const accessToken = OauthToken;
       console.log(accessToken);
       if (!accessToken) {
         console.error('Access token not found.');
