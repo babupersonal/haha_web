@@ -1,0 +1,277 @@
+var express = require('express');
+var cors = require('cors'); // 这里修正为正确的模块名
+const fetch = (...args) => 
+    import('node-fetch').then(({default: fetch}) => fetch(...args));
+var bodyParser = require ('body-parser')
+
+const CLIENT_ID = 'Iv1.5f95480a214aafea';
+const CLIENT_SECRET = '16d9140a9b1ae54d7b0915193b1d380edd337dfe';
+
+var app = express();
+
+app.use(cors());
+app.use(bodyParser.json());
+
+app.get('/getAccessToken' , async function (req,res){
+    req.query.code;
+
+    const pamars = '?client_id=' + CLIENT_ID + '&client_secret=' + CLIENT_SECRET + '&code=' + req.query.code;
+
+    await fetch('https://github.com/login/oauth/access_token' + pamars,{
+        method:'POST',
+        headers:{
+            'Accept':'application/json'
+        }
+    }).then((response) => {
+        return response.json();
+    }).then((data) => {
+        console.log(data);
+        res.json(data);
+    });
+});
+app.get('/getUserData', async function (req,res){
+    req.get('Authorizaion');
+    await fetch('https://api.github.com/user',{
+        method:'GET',
+        headers:{
+            'Authorization': req.get('Authorization')
+        }
+    }).then((response)=>{
+        return response.json();
+    }).then((data) => {
+        console.log(data);
+        res.json(data);
+    });
+})
+
+app.listen(4000, function(){
+    console.log('cors server running on port 4000');
+});
+
+
+
+1.
+const handleSubmit = async () => {
+  try {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      console.error('Access token not found.');
+      return;
+    }
+
+    const selectedRepo = repositories.find(repo => repo.name === repoName);
+    if (!selectedRepo) {
+      console.error(`Repository with name ${repoName} not found.`);
+      return;
+    }
+
+    const url = `https://api.github.com/repos/${owner}/${repoName}/issues`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        title: title,
+        body: content
+      }),
+    });
+
+    const responseData = await response.json();
+
+    if (response.ok) {
+      // 请求成功，更新界面或进行其他操作
+      console.log('Issue created successfully:', responseData);
+    } else {
+      // 请求失败，处理错误
+      console.error('Failed to create issue:', responseData);
+    }
+  } catch (error) {
+    console.error('Error adding issue:', error);
+  }
+};
+
+
+2.
+  const handleSubmit = async () => {
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('Access token not found.');
+        return;
+      }
+  
+      const selectedRepo = repositories.find(repo => repo.name === repoName);
+      if (!selectedRepo) {
+        console.error(`Repository with name ${repoName} not found.`);
+        return;
+      }
+  
+      const query = `
+      mutation CreateIssue($title: String!, $body: String!, $repositoryId: ID!) {
+        createIssue(input: { repositoryId: $repositoryId, title: $title, body: $body }) {
+          issue {
+            id
+            title
+            body
+          }
+        }
+      }
+    `;    
+  
+      const variables = {
+        title: title,
+        body: content,
+        repositoryId: selectedRepo.id,
+      };
+  
+      const response = await fetch('http://localhost:4000/createIssue', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ query, variables }),
+      });
+  
+      const responseData = await response.json();
+  
+      if (responseData.data && responseData.data.createIssue && responseData.data.createIssue.issue) {
+        const newIssue = responseData.data.createIssue.issue;
+        setIssue(prevIssue => [...prevIssue, newIssue]);
+      } else {
+        console.error('Error creating issue:', responseData.errors);
+      }
+    } catch (error) {
+      console.error('Error adding issue:', error);
+    }
+  }; 
+
+
+
+
+  4.
+  var express = require('express');
+var cors = require('cors'); // 这里修正为正确的模块名
+const fetch = await import('node-fetch');
+var bodyParser = require ('body-parser')
+
+const CLIENT_ID = 'Iv1.5f95480a214aafea';
+const CLIENT_SECRET = '16d9140a9b1ae54d7b0915193b1d380edd337dfe';
+
+var app = express();
+
+app.use(cors());
+app.use(bodyParser.json());
+app.options('*', cors());
+
+app.get('/getAccessToken' , async function (req,res){
+    req.query.code;
+
+    const pamars = '?client_id=' + CLIENT_ID + '&client_secret=' + CLIENT_SECRET + '&code=' + req.query.code;
+
+    await fetch('https://github.com/login/oauth/access_token' + pamars,{
+        method:'POST',
+        headers:{
+            'Accept':'application/json'
+        }
+    }).then((response) => {
+        return response.json();
+    }).then((data) => {
+        console.log(data);
+        res.json(data);
+    });
+});
+app.get('/getUserData', async function (req,res){
+    req.get('Authorizaion');
+    await fetch('https://api.github.com/user',{
+        method:'GET',
+        headers:{
+            'Authorization': req.get('Authorization')
+        }
+    }).then((response)=>{
+        return response.json();
+    }).then((data) => {
+        console.log(data);
+        res.json(data);
+    });
+})
+
+// 错误处理中间件
+app.use(function(err, req, res, next) {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something broke!' });
+});
+
+// 创建Issue路由
+app.post('/createIssue', async function (req, res, next) {
+    const { title, body } = req.body;
+
+    try {
+        // 从请求头部获取访问令牌
+        const authorizationHeader = req.headers.authorization;
+
+        // 确保请求头部中包含了授权信息
+        if (!authorizationHeader) {
+            return res.status(401).json({ error: 'Unauthorized: Access token is missing' });
+        }
+
+        // 从授权信息中提取访问令牌
+        const accessToken = authorizationHeader.split(' ')[1];
+
+        // 确保访问令牌存在
+        if (!accessToken) {
+            return res.status(401).json({ error: 'Unauthorized: Access token is missing' });
+        }
+
+        // 构建 GraphQL 突变
+        const query = `
+            mutation CreateIssue($title: String!, $body: String!, $owner: String!, $repoName: String!) {
+                createIssue(input: { repositoryName: $repoName, title: $title, body: $body, owner: $owner }) {
+                    issue {
+                        id
+                        title
+                        body
+                    }
+                }
+            }
+        `;
+
+        // 定义变量
+        const variables = {
+            title,
+            body,
+            owner: OWNER, // 你的 GitHub 用户名
+            repoName: REPO_NAME // 你的存储库名称
+        };
+
+        // 执行 GraphQL 请求
+        const response = await fetch('https://api.github.com/graphql', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ query, variables }),
+        });
+
+        const responseData = await response.json();
+
+        // 处理响应并返回结果
+        res.json(responseData);
+    } catch (error) {
+        // 将错误传递给 Express 的错误处理中间件
+        next(error);
+    }
+});
+
+
+app.listen(4000, function(){
+    console.log('cors server running on port 4000');
+});
+
